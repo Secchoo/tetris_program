@@ -6,14 +6,14 @@ class App:
     def __init__(self):
         pg.init()
         pg.display.set_caption('Tetris')
-        self.screen = pg.display.set_mode(FIELD_RES)
+        self.screen = pg.display.set_mode(field_res)
         self.clock = pg.time.Clock()
 
     def update(self):
         self.clock.tick(FPS)
 
     def draw(self):
-        self.screen.fill(color=FIELD_COLOR)
+        self.screen.fill(color=field_color)
         pg.display.flip()
 
     def check_events(self):
