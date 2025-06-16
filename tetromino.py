@@ -19,6 +19,12 @@ class Block(pg.sprite.Sprite):
     def update(self):
         self.set_rect_pos()
 
+    def is_collide(self, pos):
+        x, y = int(pos.x), int(pos.y)
+        if 0 <= x < field_w and 0 <= y < field_h:
+            return False
+        return True
+
 
 class Tetromino:
     def __init__(self, tetris):
@@ -26,11 +32,17 @@ class Tetromino:
         self.shape = random.choice(list(tetrominoes.keys()))
         self.blocks = [Block(self, pos) for pos in tetrominoes[self.shape]]
 
+    def is_collide(self, block_positions):
+        return any(block.is_collide(pos) for block, pos in zip(self.blocks, block_positions))
+
     def move(self, direction):
         move_direction = move_directions[direction]
-        for block in self.blocks:
-            block.pos += move_direction
+        new_block_positions = [block.pos + move_direction for block in self.blocks]
+        is_collide = self.is_collide(new_block_positions)
+
+        if not is_collide:
+            for block in self.blocks:
+                block.pos += move_direction
 
     def update(self):
         self.move(direction='down')
-        pg.time.wait(200) #simulate a slow falling block    
