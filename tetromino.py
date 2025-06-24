@@ -31,6 +31,7 @@ class Tetromino:
         self.tetris = tetris
         self.shape = random.choice(list(tetrominoes.keys()))
         self.blocks = [Block(self, pos) for pos in tetrominoes[self.shape]]
+        self.landing = False
 
     def is_collide(self, block_positions):
         return any(block.is_collide(pos) for block, pos in zip(self.blocks, block_positions))
@@ -43,6 +44,8 @@ class Tetromino:
         if not is_collide:
             for block in self.blocks:
                 block.pos += move_direction
+        elif direction == 'down':
+            self.landing = True
 
     def update(self):
         self.move(direction='down')
