@@ -11,13 +11,33 @@ class Block(pg.sprite.Sprite):
 
         super().__init__(self.tetromino.tetris.sprite_group)
         self.image = tetromino.image
-       # self.image = pg.Surface((tile_size, tile_size))
-       # pg.draw.rect(self.image, 'blue', (1, 1, tile_size - 2, tile_size - 2), border_radius=8)
         self.rect = self.image.get_rect()
+
+        self.sfx_image = self.image.copy()
+        self.sfx_image.set_alpha(110)
+        self.sfx_speed = random.uniform(0.2, 0.6)
+        self.sfx_cycles = random.randrange(6, 8)
+        self.cycle_count = 0
+        self.sfx_direction = 1  # 1 for down, -1 for up (default down)
+
+    def sfx_end_time(self):
+        if self.tetromino.tetris.app.anim_trigger:
+            self.cycle_count += 1
+            if self.cycle_count > self.sfx_cycles:
+                self.cycle_count = 0
+                return True
+
+    def sfx_run(self):
+        self.image = self.sfx_image
+        self.pos.y += self.sfx_speed * self.sfx_direction  # Animate in the set direction
+        self.image = pg.transform.rotate(self.image, pg.time.get_ticks() * self.sfx_speed)
 
     def is_alive(self):
         if not self.alive:
-            self.kill()
+            if not self.sfx_end_time():
+                self.sfx_run()
+            else:
+                self.kill()
 
     def rotate(self, pivot_pos):
         translated = self.pos - pivot_pos

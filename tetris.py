@@ -56,17 +56,18 @@ class Tetris:
         for y in range(field_h - 1, -1, -1):
             for x in range(field_w):
                 self.get_field_array[row][x] = self.get_field_array[y][x]
-
                 if self.get_field_array[y][x]:
-                    self.get_field_array[row][x].pos = vec(x, y)
-
+                    self.get_field_array[row][x].pos = vec(x, row)
             if sum(map(bool, self.get_field_array[y])) < field_w:
                 row -= 1
             else:
+                # Only dissolve the full line, and animate blocks upwards
                 for x in range(field_w):
-                    self.get_field_array[row][x].alive = False
-                    self.get_field_array[row][x] = 0
-
+                    block = self.get_field_array[row][x]
+                    if block:
+                        block.alive = False
+                        block.sfx_direction = -1  # Animate upwards
+                        self.get_field_array[row][x] = 0
                 self.full_lines += 1
 
     def tetromino_blocks_in_array(self):
