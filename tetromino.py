@@ -10,8 +10,12 @@ class Block(pg.sprite.Sprite):
         super().__init__(self.tetromino.tetris.sprite_group)
         self.image = pg.Surface((tile_size, tile_size))
         self.image.fill('green')
-
         self.rect = self.image.get_rect()
+
+    def rotate(self, pivot_pos):
+        translated = self.pos - pivot_pos
+        rotated = translated.rotate(90)
+        return rotated + pivot_pos
     
     def set_rect_pos(self):
         self.rect.topleft = self.pos * tile_size
@@ -33,6 +37,14 @@ class Tetromino:
         self.shape = random.choice(list(tetrominoes.keys()))
         self.blocks = [Block(self, pos) for pos in tetrominoes[self.shape]]
         self.landing = False
+
+    def rotate(self):
+        pivot_pos = self.blocks[0].pos
+        new_block_positions = [block.rotate(pivot_pos) for block in self.blocks]
+
+        if not self.is_collide(new_block_positions):
+            for i, block in enumerate(self.blocks):
+                block.pos = new_block_positions[i]
 
     def is_collide(self, block_positions):
         return any(block.is_collide(pos) for block, pos in zip(self.blocks, block_positions))
