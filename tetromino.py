@@ -6,11 +6,13 @@ class Block(pg.sprite.Sprite):
     def __init__(self, tetromino, pos):
         self.tetromino = tetromino
         self.pos = vec(pos) + init_pos_offset
+        self.next_pos = vec(pos) + next_pos_offset
         self.alive = True
 
         super().__init__(self.tetromino.tetris.sprite_group)
-        self.image = pg.Surface((tile_size, tile_size))
-        pg.draw.rect(self.image, 'blue', (1, 1, tile_size - 2, tile_size - 2), border_radius=8)
+        self.image = tetromino.image
+       # self.image = pg.Surface((tile_size, tile_size))
+       # pg.draw.rect(self.image, 'blue', (1, 1, tile_size - 2, tile_size - 2), border_radius=8)
         self.rect = self.image.get_rect()
 
     def is_alive(self):
@@ -23,7 +25,8 @@ class Block(pg.sprite.Sprite):
         return rotated + pivot_pos
     
     def set_rect_pos(self):
-        self.rect.topleft = self.pos * tile_size
+        pos = [self.next_pos, self.pos][self.tetromino.current]
+        self.rect.topleft = pos * tile_size
 
     def update(self):
         self.is_alive()
@@ -38,11 +41,13 @@ class Block(pg.sprite.Sprite):
 
 
 class Tetromino:
-    def __init__(self, tetris):
+    def __init__(self, tetris, current=True):
         self.tetris = tetris
         self.shape = random.choice(list(tetrominoes.keys()))
+        self.image =  random.choice(tetris.app.images)
         self.blocks = [Block(self, pos) for pos in tetrominoes[self.shape]]
         self.landing = False
+        self.current = current
 
     def rotate(self):
         pivot_pos = self.blocks[0].pos

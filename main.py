@@ -1,16 +1,25 @@
 from settings import *
-from tetris import Tetris
+from tetris import Tetris, Text
 import sys
+import pathlib
 
 
 class App:
     def __init__(self):
         pg.init()
         pg.display.set_caption('Tetris')
-        self.screen = pg.display.set_mode(field_res)
+        self.screen = pg.display.set_mode(win_res)
         self.clock = pg.time.Clock()
         self.set_timer()
+        self.images = self.load_assets()
         self.tetris = Tetris(self)
+        self.text = Text(self)
+
+    def load_assets(self):
+        files = [item for item in pathlib.Path(sprite_dir_path).rglob('*.png') if item.is_file()]
+        images = [pg.image.load(file).convert_alpha() for file in files]
+        images = [pg.transform.scale(image, (tile_size, tile_size)) for image in images]
+        return images
 
     def set_timer(self):
         self.user_event = pg.USEREVENT + 0
@@ -25,8 +34,10 @@ class App:
         self.clock.tick(FPS)
 
     def draw(self):
-        self.screen.fill(color=field_color)
+        self.screen.fill(color=bg_color)
+        self.screen.fill(color=field_color, rect=(0, 0, *field_res))
         self.tetris.draw()
+        self.text.draw()
         pg.display.flip()
 
     def check_events(self):
