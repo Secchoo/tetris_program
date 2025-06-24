@@ -21,7 +21,8 @@ class Block(pg.sprite.Sprite):
 
     def is_collide(self, pos):
         x, y = int(pos.x), int(pos.y)
-        if 0 <= x < field_w and 0 <= y < field_h:
+        if 0 <= x < field_w and 0 <= y < field_h and (
+            y < 0 or not self.tetromino.tetris.get_field_array[y][x]):
             return False
         return True
 
